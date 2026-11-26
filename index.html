@@ -139,10 +139,8 @@ kbd{font:700 14px var(--texto);background:#fff;border:2px solid var(--ciruela);b
 .trailer{max-width:980px;margin:auto;border:4px solid #fff;border-radius:12px;overflow:hidden;box-shadow:0 0 0 4px var(--rosa),0 30px 60px #0008;background:#000}
 .trailer video{width:100%;display:block;aspect-ratio:16/9;background:#000}
 
-.musica{max-width:980px;margin:18px auto 0;display:flex;gap:18px;align-items:center;flex-wrap:wrap;color:#dccaf2;font:700 19px/1.3 var(--nota)}
-.musica p{margin:0;flex:1;min-width:240px}
-.yt-caja{width:240px;aspect-ratio:16/9;border:3px solid var(--rosa);border-radius:10px;overflow:hidden;background:#000;flex:none}
-.yt-caja iframe{width:100%;height:100%;display:block}
+#ytoc{position:fixed;left:-9999px;top:0;width:200px;height:200px;overflow:hidden;opacity:0;pointer-events:none}
+#ytoc iframe{width:200px;height:200px}
 /* galería */
 .galeria{columns:4 230px;column-gap:16px}
 .galeria figure{margin:0 0 16px;break-inside:avoid;background:#fff;padding:9px 9px 30px;border-radius:4px;box-shadow:0 10px 22px #4a1d6a25;position:relative;cursor:zoom-in;transition:.2s}
@@ -264,7 +262,7 @@ footer.pie a{color:var(--rosa)}
 <section id="trailer" class="oscura"><div class="wrap">
   <div class="cab rev"><span class="mini">60 segundos</span><h2>el tráiler</h2></div>
   <div class="trailer rev"><video id="tv" controls muted preload="metadata" poster="img/shot-nivel1.jpg" playsinline><source src="trailer/trailer.mp4" type="video/mp4">Tu navegador no puede reproducir el video.</video></div>
-  <div class="musica rev"><div class="yt-caja"><div id="yt"></div></div><p>♪ Música de fondo del tráiler: canción de YouTube, desde el minuto 4:37. Se reproduce junto al video desde el reproductor de YouTube. <button class="mini-btn" id="mtog" type="button">silenciar música</button></p></div>
+  <div id="ytoc" aria-hidden="true"><div id="yt"></div></div>
 </div></section>
 
 <!-- ═════════ PERSONAJES ═════════ -->
@@ -378,18 +376,20 @@ footer.pie a{color:var(--rosa)}
   pant.addEventListener('click',function(){var f=visor.querySelector('iframe');if(f&&f.requestFullscreen)f.requestFullscreen()});
 
 
-  /* música del tráiler: audio de YouTube desde 4:37 sincronizado con el video (el video va sin sonido propio) */
-  var tv=document.getElementById('tv'),yp=null,ypListo=false,INI=277,mut=document.getElementById('mtog');
-  window.onYouTubeIframeAPIReady=function(){yp=new YT.Player('yt',{width:'100%',height:'100%',videoId:'45O5T9ah9Eo',playerVars:{start:INI,controls:0,rel:0,playsinline:1,modestbranding:1,origin:location.origin},events:{onReady:function(){ypListo=true;if(!tv.paused)sync(true)}}})};
+  /* música del tráiler: audio de YouTube (oculto) desde 4:37; suena solo mientras el video está en play */
+  var tv=document.getElementById('tv'),yp=null,ypListo=false,INI=277;
+  window.onYouTubeIframeAPIReady=function(){yp=new YT.Player('yt',{width:'200',height:'200',videoId:'45O5T9ah9Eo',playerVars:{start:INI,controls:0,rel:0,playsinline:1,modestbranding:1,disablekb:1,fs:0,origin:location.origin},events:{onReady:function(){ypListo=true;if(!tv.paused)sync(true)}}})};
   var t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';document.head.appendChild(t);
   function sync(play){if(!ypListo)return;try{yp.seekTo(INI+tv.currentTime,true);if(play)yp.playVideo()}catch(e){}}
+  function parar(){if(ypListo)try{yp.pauseVideo()}catch(e){}}
   tv.addEventListener('play',function(){sync(true)});
   tv.addEventListener('playing',function(){sync(true)});
-  tv.addEventListener('pause',function(){if(ypListo)try{yp.pauseVideo()}catch(e){}});
-  tv.addEventListener('seeked',function(){sync(!tv.paused)});
+  tv.addEventListener('pause',parar);
+  tv.addEventListener('waiting',parar);
+  tv.addEventListener('ended',function(){parar();if(ypListo)try{yp.seekTo(INI,true);yp.pauseVideo()}catch(e){}});
+  tv.addEventListener('seeked',function(){if(tv.paused)parar();else sync(true)});
+  tv.addEventListener('timeupdate',function(){if(!ypListo||tv.paused)return;try{if(Math.abs(yp.getCurrentTime()-(INI+tv.currentTime))>0.8)yp.seekTo(INI+tv.currentTime,true)}catch(e){}});
   tv.addEventListener('volumechange',function(){if(!tv.muted)tv.muted=true});
-  tv.addEventListener('ended',function(){if(ypListo)try{yp.pauseVideo()}catch(e){}});
-  mut.addEventListener('click',function(){if(!ypListo)return;if(yp.isMuted()){yp.unMute();mut.textContent='silenciar música'}else{yp.mute();mut.textContent='activar música'}});
 
   /* galería ampliada */
   var vi=document.getElementById('vi'),vimg=vi.querySelector('img'),vp=vi.querySelector('p');
