@@ -3,7 +3,6 @@
 **Videojuego 3D narrativo con toques de terror psicológico, hecho en Unity 6 y jugable en el navegador (WebGL).** Proyecto final de Game Development.
 
 - **Jugar / página del juego:** https://denistae.github.io/YouSeemPrettySad/
-- **Portal de los otros juegos del equipo:** https://denistae.github.io/TheCureRun_Portal_GitHub/
 
 ## Historia
 
