@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7d9ea">
+<meta name="description" content="YOU SEEM PRETTY SAD: videojuego 3D narrativo hecho en Unity. Arivelle abre su diario y se enfrenta a El Eco a través de cuatro capítulos. Juega gratis desde el navegador.">
+<title>you seem pretty sad · videojuego jugable en el navegador</title>
+<link rel="icon" href="img/favicon.ico">
+<meta property="og:title" content="you seem pretty sad">
+<meta property="og:description" content="Un videojuego 3D sobre recuerdos, diarios y un eco que no se calla. Jugable en el navegador.">
+<meta property="og:image" content="img/shot-nivel1.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Gaegu:wght@400;700&family=Shadows+Into+Light+Two&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rosa:#ff8fc8;--rosa-claro:#ffd6ea;--crema:#fff5f9;--ciruela:#2a1240;--ciruela-2:#3b1a5a;--violeta:#b79cf0;--lila:#e6d9fb;--rojo:#d6336c;--tinta:#3a2146;
+  --letra:"Reenie Beanie","Gaegu","Shadows Into Light Two",cursive;
+  --nota:"Gaegu","Shadows Into Light Two",cursive;
+  --texto:"DM Sans",system-ui,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{margin:0;background:var(--crema);color:var(--tinta);font:17px/1.7 var(--texto);overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+::selection{background:var(--rosa);color:var(--ciruela)}
+.wrap{width:min(1180px,calc(100% - 40px));margin:auto}
+
+/* ───────── barra superior ───────── */
+header.bar{position:sticky;top:0;z-index:50;background:#fff0f7ee;backdrop-filter:blur(14px);border-bottom:2px dashed #f2b6d6}
+.bar-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
+.logo{font:400 34px/1 var(--letra);letter-spacing:.02em;color:var(--ciruela);text-decoration:none;white-space:nowrap}
+.logo b{color:var(--rojo);font-weight:400}
+nav.menu{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+nav.menu a{font:700 18px/1 var(--nota);text-decoration:none;padding:9px 13px;border-radius:999px;color:var(--ciruela-2);transition:.18s}
+nav.menu a:hover{background:var(--rosa-claro)}
+nav.menu a.jugar{background:var(--ciruela);color:#fff;transform:rotate(-2deg)}
+nav.menu a.jugar:hover{background:var(--rojo)}
+@media(max-width:760px){nav.menu a:not(.jugar):not(.vol){display:none}.logo{font-size:29px}}
+
+/* ───────── héroe ───────── */
+.hero{position:relative;padding:54px 0 86px;background:
+  radial-gradient(circle at 12% 18%,#ffd1e8 0,transparent 36%),
+  radial-gradient(circle at 88% 12%,#e1d2fb 0,transparent 40%),
+  linear-gradient(180deg,#fff0f7,#fbe3f0);
+  overflow:hidden}
+.hero:before{content:"♥ ♡ ♥ ♡ ♥ ♡ ♥ ♡ ♥ ♡ ♥ ♡";position:absolute;left:0;right:0;top:14px;text-align:center;letter-spacing:.8em;color:#f6a9cf;font-size:20px;opacity:.7;white-space:nowrap;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.kicker{font:700 22px var(--nota);color:var(--rojo);transform:rotate(-1.5deg);display:inline-block}
+h1.titulo{margin:6px 0 4px;font:400 clamp(76px,12vw,172px)/.72 var(--letra);color:var(--ciruela);letter-spacing:.01em;text-shadow:3px 3px 0 #fff,6px 6px 0 #f6b0d4}
+h1.titulo em{font-style:normal;color:var(--rojo);display:block;margin-left:.35em;transform:rotate(-2deg)}
+.subtitulo{font:700 26px/1.25 var(--nota);max-width:560px;margin:22px 0 26px;color:var(--ciruela-2)}
+.botones{display:flex;gap:14px;flex-wrap:wrap}
+.btn{font:700 24px/1 var(--nota);text-decoration:none;border:3px solid var(--ciruela);padding:14px 26px;border-radius:999px;background:#fff;color:var(--ciruela);display:inline-flex;gap:10px;align-items:center;box-shadow:5px 5px 0 var(--ciruela);transition:.15s;cursor:pointer}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ciruela)}
+.btn.rosa{background:var(--rosa)}
+.btn.oscuro{background:var(--ciruela);color:#fff;box-shadow:5px 5px 0 var(--rosa)}
+.hero-art{position:relative;min-height:520px}
+.polaroid{position:absolute;background:#fff;padding:11px 11px 34px;box-shadow:0 14px 30px #4a1d6a30;border-radius:4px}
+.polaroid img{width:100%;height:100%;object-fit:cover}
+.polaroid:after{content:"";position:absolute;top:-14px;left:50%;width:84px;height:26px;margin-left:-42px;background:#ffd0e6cc;transform:rotate(-4deg);border:1px dashed #f5a6cc}
+.polaroid span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font:400 22px/1 var(--letra);color:var(--ciruela)}
+.p1{width:62%;aspect-ratio:3/4;left:0;top:10px;transform:rotate(-5deg)}
+.p2{width:56%;aspect-ratio:4/5;right:0;top:-6px;transform:rotate(4deg)}
+.p3{width:60%;aspect-ratio:16/10;right:6%;bottom:0;transform:rotate(-2deg);padding-bottom:30px}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.hero-art{min-height:430px;max-width:520px;margin:10px auto 0}}
+
+/* ───────── secciones ───────── */
+section{padding:84px 0;position:relative}
+.cab{margin-bottom:38px}
+.cab .mini{font:700 21px var(--nota);color:var(--rojo)}
+.cab h2{margin:0;font:400 clamp(52px,8vw,98px)/.82 var(--letra);color:var(--ciruela);letter-spacing:.01em}
+.cab p{max-width:680px;margin:14px 0 0;font-size:18px;color:#5a4266}
+.oscura{background:linear-gradient(180deg,#2a1240,#3b1a5a);color:#f6e9ff}
+.oscura .cab h2{color:#fff}
+.oscura .cab .mini{color:var(--rosa)}
+.oscura .cab p{color:#dccaf2}
+
+/* sinopsis */
+.sinopsis{display:grid;grid-template-columns:1.2fr .8fr;gap:44px;align-items:start}
+.sinopsis p{margin:0 0 16px}
+.papel{background:#fff;border:2px solid var(--ciruela);border-radius:6px;padding:24px 26px;transform:rotate(1.4deg);box-shadow:8px 8px 0 var(--rosa);background-image:repeating-linear-gradient(transparent 0 31px,#f3d7e6 31px 32px)}
+.papel h3{margin:0 0 10px;font:400 44px/1 var(--letra);color:var(--rojo)}
+.papel dl{margin:0;font:700 20px/1.5 var(--nota)}
+.papel dt{color:var(--rojo);margin-top:8px}
+.papel dd{margin:0;color:var(--ciruela)}
+@media(max-width:860px){.sinopsis{grid-template-columns:1fr}}
+
+/* jugar */
+.sala{border:3px solid var(--rosa);border-radius:16px;overflow:hidden;background:#12091f;box-shadow:0 0 0 6px #4a2370,0 30px 60px #0007}
+.sala-top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;background:#1c0d2f;color:#fff;border-bottom:2px solid #4a2370;flex-wrap:wrap}
+.sala-top strong{font:400 34px/1 var(--letra);color:var(--rosa)}
+.sala-top .acc{display:flex;gap:10px;flex-wrap:wrap}
+.mini-btn{font:700 19px var(--nota);border:2px solid var(--rosa);background:transparent;color:#ffd6ea;padding:7px 16px;border-radius:999px;cursor:pointer;text-decoration:none}
+.mini-btn:hover{background:var(--rosa);color:var(--ciruela)}
+.visor{position:relative;aspect-ratio:16/9;background:#12091f}
+.visor iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.portada{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:linear-gradient(180deg,#12091fb0,#12091fe0),url("img/shot-prologo.jpg") center/cover;color:#fff;padding:20px}
+.portada h3{margin:0;font:400 clamp(46px,9vw,110px)/.8 var(--letra);color:#fff;text-shadow:3px 3px 0 var(--rojo)}
+.portada p{font:700 22px var(--nota);color:#ffd6ea;margin:16px 0 22px}
+.ayuda{display:flex;gap:10px 24px;flex-wrap:wrap;justify-content:space-between;padding:14px 18px;background:#1c0d2f;color:#d9c7ee;font:700 19px var(--nota)}
+.ayuda kbd{font:700 17px var(--texto);background:#fff;color:var(--ciruela);border-radius:6px;padding:1px 8px;box-shadow:0 2px 0 var(--rosa)}
+
+/* niveles */
+.niveles{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.nivel{background:#fff;border:2px solid var(--ciruela);border-radius:10px;overflow:hidden;box-shadow:7px 7px 0 var(--violeta);display:flex;flex-direction:column}
+.nivel .foto{aspect-ratio:16/9;overflow:hidden;position:relative;background:#2a1240}
+.nivel .foto img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.nivel:hover .foto img{transform:scale(1.05)}
+.nivel .num{position:absolute;left:12px;top:10px;font:400 54px/1 var(--letra);color:#fff;text-shadow:2px 2px 0 var(--rojo)}
+.nivel .cuerpo{padding:18px 22px 22px}
+.nivel h3{margin:0;font:400 46px/1 var(--letra);color:var(--ciruela)}
+.nivel .tag{font:700 19px var(--nota);color:var(--rojo)}
+.nivel p{margin:8px 0 0;font-size:16px;line-height:1.6}
+@media(max-width:820px){.niveles{grid-template-columns:1fr}}
+
+/* personajes */
+.pers{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.ficha{background:#ffffff12;border:2px dashed #d9b5ee;border-radius:12px;padding:20px;text-align:center}
+.ficha img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;margin-bottom:14px;border:3px solid #fff}
+.ficha h3{margin:0;font:400 46px/1 var(--letra);color:var(--rosa)}
+.ficha p{margin:8px 0 0;font-size:16px;color:#e6d6f7}
+@media(max-width:820px){.pers{grid-template-columns:1fr}}
+
+/* mecánicas */
+.mec{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.mec article{background:#fff;border:2px solid var(--ciruela);border-radius:10px;padding:22px;box-shadow:6px 6px 0 var(--rosa)}
+.mec h3{margin:0 0 8px;font:400 40px/1 var(--letra);color:var(--rojo)}
+.mec p{margin:0;font-size:16px;line-height:1.6}
+.ctrl{margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.ctrl div{background:#fff0f7;border:2px dashed #f2a6cb;border-radius:10px;padding:14px 16px;font-size:15.5px;line-height:1.55}
+.ctrl b{font:700 21px var(--nota);color:var(--rojo);display:block}
+kbd{font:700 14px var(--texto);background:#fff;border:2px solid var(--ciruela);border-radius:6px;padding:0 7px;box-shadow:0 2px 0 var(--ciruela)}
+@media(max-width:860px){.mec{grid-template-columns:1fr}}
+
+/* tráiler */
+.trailer{max-width:980px;margin:auto;border:4px solid #fff;border-radius:12px;overflow:hidden;box-shadow:0 0 0 4px var(--rosa),0 30px 60px #0008;background:#000}
+.trailer video{width:100%;display:block;aspect-ratio:16/9;background:#000}
+
+/* galería */
+.galeria{columns:4 230px;column-gap:16px}
+.galeria figure{margin:0 0 16px;break-inside:avoid;background:#fff;padding:9px 9px 30px;border-radius:4px;box-shadow:0 10px 22px #4a1d6a25;position:relative;cursor:zoom-in;transition:.2s}
+.galeria figure:nth-child(3n){transform:rotate(1.2deg)}
+.galeria figure:nth-child(3n+1){transform:rotate(-1.2deg)}
+.galeria figure:hover{transform:rotate(0) scale(1.03);z-index:2}
+.galeria img{width:100%;height:auto}
+.galeria figcaption{position:absolute;left:0;right:0;bottom:4px;text-align:center;font:400 22px/1 var(--letra);color:var(--ciruela)}
+.visor-img{position:fixed;inset:0;background:#1a0a2bee;z-index:100;display:none;place-items:center;padding:24px;cursor:zoom-out}
+.visor-img.abierto{display:grid}
+.visor-img img{max-height:88vh;max-width:94vw;border:6px solid #fff;border-radius:4px;box-shadow:0 20px 60px #000a}
+.visor-img p{position:absolute;bottom:18px;left:0;right:0;text-align:center;font:400 30px var(--letra);color:#fff;margin:0}
+
+/* tecnología */
+.tec{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.tec span{font:700 20px var(--nota);border:2px solid var(--ciruela);border-radius:999px;padding:6px 16px;background:#fff}
+
+/* autores (parte final) */
+.autores{background:linear-gradient(180deg,#fbe3f0,#f3c5de);text-align:center;padding:84px 0 96px;border-top:3px dashed var(--rosa)}
+.autores h2{margin:0;font:400 clamp(56px,9vw,110px)/.82 var(--letra);color:var(--ciruela)}
+.autores .lema{font:700 24px var(--nota);color:var(--rojo);margin:10px 0 36px}
+.gente{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;max-width:860px;margin:auto}
+.autor{background:#fff;border:3px solid var(--ciruela);border-radius:14px;padding:28px 22px;box-shadow:8px 8px 0 var(--ciruela);text-decoration:none;display:block;transition:.18s}
+.autor:hover{transform:translate(-3px,-3px);box-shadow:11px 11px 0 var(--rojo)}
+.autor .av{width:88px;height:88px;border-radius:50%;margin:0 auto 12px;background:var(--rosa);border:3px solid var(--ciruela);display:grid;place-items:center;font:400 46px/1 var(--letra);color:var(--ciruela)}
+.autor b{display:block;font:400 42px/1 var(--letra);color:var(--ciruela)}
+.autor small{display:block;font:700 19px var(--nota);color:var(--rojo);margin:4px 0 10px}
+.autor span.gh{display:inline-block;font:700 18px var(--texto);background:var(--ciruela);color:#fff;border-radius:999px;padding:6px 16px}
+footer.pie{background:var(--ciruela);color:#e9d9fb;text-align:center;padding:22px 16px;font:700 19px var(--nota)}
+footer.pie a{color:var(--rosa)}
+
+.rev{opacity:0;transform:translateY(22px);transition:.7s}
+.rev.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rev{opacity:1;transform:none;transition:none}.btn,.nivel .foto img{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="wrap bar-in">
+  <a class="logo" href="#inicio">you seem pretty <b>sad</b></a>
+  <nav class="menu" aria-label="Navegación principal">
+    <a href="#historia">Historia</a><a href="#niveles">Niveles</a><a href="#personajes">Personajes</a><a href="#galeria">Galería</a><a href="#autores">Autores</a>
+    <a class="vol" href="https://denistae.github.io/TheCureRun_Portal_GitHub/">← Portal</a>
+    <a class="jugar" href="#jugar">¡Jugar!</a>
+  </nav>
+</div></header>
+
+<main>
+<!-- ═════════ HÉROE ═════════ -->
+<div class="hero" id="inicio"><div class="wrap hero-grid">
+  <div>
+    <span class="kicker">un juego sobre recuerdos, diarios y un eco que no se calla ♡</span>
+    <h1 class="titulo">you seem<em>pretty sad</em></h1>
+    <p class="subtitulo">Arivelle abre su diario. Cuatro capítulos, un tablero que se mueve solo, un hospital que respira y un enemigo que conoce todas sus palabras.</p>
+    <div class="botones">
+      <a class="btn rosa" href="#jugar">▶ jugar en el navegador</a>
+      <a class="btn" href="#trailer">ver el tráiler</a>
+      <a class="btn oscuro" href="#niveles">los niveles</a>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="polaroid p1"><img src="img/ari-retrato.jpg" alt=""><span>arivelle</span></div>
+    <div class="polaroid p2"><img src="img/ari-personajes.jpg" alt="" style="object-position:30% 20%"><span>ari</span></div>
+    <div class="polaroid p3"><img src="img/shot-prologo.jpg" alt=""><span>su habitación</span></div>
+  </div>
+</div></div>
+
+<!-- ═════════ HISTORIA ═════════ -->
+<section id="historia"><div class="wrap">
+  <div class="cab rev"><span class="mini">de qué trata</span><h2>una habitación<br>llena de cosas<br>sin ordenar</h2></div>
+  <div class="sinopsis rev">
+    <div>
+      <p><b>YOU SEEM PRETTY SAD</b> es un videojuego 3D narrativo, con un toque de terror psicológico, desarrollado en Unity. Arivelle siente que su habitación se ha vuelto más pequeña: hay demasiadas cosas que no consigue ordenar, y no habla solo de objetos.</p>
+      <p>Una noche decide abrir su diario. Cada recuerdo que toca se convierte en un capítulo jugable: un tablero de casillas contra su propio <b>Eco</b>, un hospital abandonado que hay que atravesar con una linterna, una carrera a pie por una Nueva York de neón y una última carrera de autos sobre una pista con forma de corazón.</p>
+      <p>No hay un final feliz garantizado: hay un final honesto. Reúne los recuerdos, vence al Eco en cada capítulo y decide qué dejar atrás.</p>
+      <div class="tec"><span>Unity 6</span><span>C#</span><span>URP</span><span>WebGL</span><span>100 % procedural</span></div>
+    </div>
+    <aside class="papel">
+      <h3>ficha del juego</h3>
+      <dl>
+        <dt>género</dt><dd>aventura narrativa 3D + minijuegos</dd>
+        <dt>plataforma</dt><dd>navegador (PC con teclado y mouse)</dd>
+        <dt>duración</dt><dd>unos 25–40 minutos</dd>
+        <dt>capítulos</dt><dd>prólogo · 4 niveles · epílogo</dd>
+        <dt>vidas</dt><dd>3 por capítulo</dd>
+        <dt>idioma</dt><dd>español</dd>
+      </dl>
+    </aside>
+  </div>
+</div></section>
+
+<!-- ═════════ JUGAR ═════════ -->
+<section id="jugar" class="oscura"><div class="wrap">
+  <div class="cab rev"><span class="mini">sin descargas, sin cuentas</span><h2>juega ahora</h2><p>El juego se ejecuta en esta misma página con WebGL. La primera carga puede tardar un poco (se guarda en caché). Se recomienda Chrome, Edge o Firefox en un computador, con el sonido activado.</p></div>
+  <div class="sala rev">
+    <div class="sala-top"><strong>you seem pretty sad</strong>
+      <div class="acc"><button class="mini-btn" id="pantalla" type="button" hidden>pantalla completa</button><a class="mini-btn" href="juego/index.html" target="_blank" rel="noopener">abrir en pestaña nueva ↗</a></div></div>
+    <div class="visor" id="visor">
+      <div class="portada" id="portada"><div><h3>you seem<br>pretty sad</h3><p>presiona START y entra al diario de Arivelle</p><button class="btn rosa" id="start" type="button">START ▶</button></div></div>
+    </div>
+    <div class="ayuda"><span><kbd>WASD</kbd> mover · <kbd>E</kbd> interactuar · <kbd>J</kbd> recuerdos · <kbd>Esc</kbd> pausa</span><span>haz clic dentro del juego para activar el teclado</span></div>
+  </div>
+</div></section>
+
+<!-- ═════════ NIVELES ═════════ -->
+<section id="niveles"><div class="wrap">
+  <div class="cab rev"><span class="mini">cuatro recuerdos</span><h2>los niveles</h2><p>Cada capítulo cambia por completo la forma de jugar, pero comparte la misma regla: tienes tres vidas y El Eco siempre está cerca.</p></div>
+  <div class="niveles">
+    <article class="nivel rev"><div class="foto"><img src="img/shot-prologo.jpg" alt="Habitación de Arivelle" loading="lazy"><span class="num">0</span></div><div class="cuerpo"><h3>la habitación</h3><span class="tag">prólogo y epílogo · exploración</span><p>Un cuarto rosa que se desordena cuando los recuerdos regresan. Explora, abre el diario, encuentra notas y escucha lo que dice El Eco desde el espejo.</p></div></article>
+    <article class="nivel rev"><div class="foto"><img src="img/shot-nivel1.jpg" alt="Tablero de casillas flotante" loading="lazy"><span class="num">1</span></div><div class="cuerpo"><h3>less</h3><span class="tag">tablero de casillas · carrera contra El Eco</span><p>Un tablero flotante de 70 casillas con bifurcaciones, portales y dados con corazones. Llega primero a la salida y arma rompecabezas de recuerdos en 40 segundos.</p></div></article>
+    <article class="nivel rev"><div class="foto"><img src="img/shot-nivel2.jpg" alt="Hospital abandonado" loading="lazy"><span class="num">2</span></div><div class="cuerpo"><h3>the cure</h3><span class="tag">exploración · sigilo · linterna</span><p>Un hospital de azulejos verdes y pasillos infinitos. Alumbra a los fantasmas para que huyan, abre puertas y activa el mecanismo de escape.</p></div></article>
+    <article class="nivel rev"><div class="foto"><img src="img/shot-nivel3.jpg" alt="Calles de Nueva York" loading="lazy"><span class="num">3</span></div><div class="cuerpo"><h3>stupid song</h3><span class="tag">corredor infinito · tres carriles</span><p>Corre por una Nueva York con lluvia y neón. Salta pianos de cola, agáchate bajo las zapatillas de ballet y cruza el túnel del metro.</p></div></article>
+    <article class="nivel rev"><div class="foto"><img src="img/shot-nivel4.jpg" alt="Carrera sobre pista en forma de corazón" loading="lazy"><span class="num">4</span></div><div class="cuerpo"><h3>cigarette smoke</h3><span class="tag">carrera de autos · derrapes</span><p>Una pista con forma de corazón que se rompe a mitad de carrera. Esquiva cigarros y llamas, derrapa en las curvas y llega a la meta antes de que se apague todo.</p></div></article>
+    <article class="nivel rev"><div class="foto"><img src="img/shot-puzzle.jpg" alt="Minijuego de rompecabezas" loading="lazy"><span class="num">♡</span></div><div class="cuerpo"><h3>minijuegos de recuerdos</h3><span class="tag">rompecabezas · 40 segundos</span><p>En el tablero, las casillas de recuerdo lanzan un rompecabezas con las ilustraciones del juego. Si lo completas ganas ventaja; si no, pierdes una vida.</p></div></article>
+  </div>
+</div></section>
+
+<!-- ═════════ TRÁILER ═════════ -->
+<section id="trailer" class="oscura"><div class="wrap">
+  <div class="cab rev"><span class="mini">60 segundos</span><h2>el tráiler</h2></div>
+  <div class="trailer rev"><video controls preload="metadata" poster="img/shot-nivel1.jpg" playsinline><source src="trailer/trailer.mp4" type="video/mp4">Tu navegador no puede reproducir el video.</video></div>
+</div></section>
+
+<!-- ═════════ PERSONAJES ═════════ -->
+<section id="personajes"><div class="wrap">
+  <div class="cab rev"><span class="mini">quién es quién</span><h2>personajes</h2></div>
+  <div class="pers" style="color:var(--tinta)">
+    <article class="ficha rev" style="background:#2a1240;color:#fff"><img src="img/ari-personajes.jpg" alt="Arivelle, hoja de personaje" style="object-position:35% 10%"><h3>arivelle</h3><p>Protagonista. Cuatro estilos de ropa, cuatro etapas de su historia. Escribe un diario porque hablar le cuesta.</p></article>
+    <article class="ficha rev" style="background:#2a1240;color:#fff"><img src="img/espejo.jpg" alt="Arivelle frente al espejo"><h3>el eco</h3><p>Su reflejo que no obedece. Aparece en el espejo, en los pasillos y en la meta de cada nivel. Siempre sabe qué dirás después.</p></article>
+    <article class="ficha rev" style="background:#2a1240;color:#fff"><img src="img/then-vs-now.jpg" alt="Antes y ahora"><h3>los recuerdos</h3><p>Personas, lugares y objetos que vuelven convertidos en niveles: un diario, un vinilo, un globo de nieve, una cama deshecha.</p></article>
+  </div>
+</div></section>
+
+<!-- ═════════ MECÁNICAS ═════════ -->
+<section id="mecanicas" class="oscura"><div class="wrap">
+  <div class="cab rev"><span class="mini">cómo se juega</span><h2>mecánicas y controles</h2></div>
+  <div class="mec rev" style="color:var(--tinta)">
+    <article><h3>tres vidas</h3><p>Cada capítulo empieza con tres corazones. Si los pierdes, el capítulo se reinicia. Hay corazones para recuperar vida en los niveles.</p></article>
+    <article><h3>el registro</h3><p>Las notas que encuentras se guardan en el registro de recuerdos (<kbd>J</kbd>). Reúnelas para entender la historia completa.</p></article>
+    <article><h3>el eco te persigue</h3><p>Es un rival en el tablero, un fantasma en el hospital y una sombra en la carretera. Su comportamiento es automático y cambia en cada nivel.</p></article>
+  </div>
+  <div class="ctrl rev" style="color:var(--tinta)">
+    <div><b>exploración · prólogo y nivel 2</b><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> mover · mouse mirar · <kbd>E</kbd> interactuar · <kbd>F</kbd> linterna · <kbd>Shift</kbd> correr</div>
+    <div><b>nivel 1 · tablero</b>clic en el dado o <kbd>Espacio</kbd> para tirar · <kbd>←</kbd><kbd>→</kbd> + <kbd>Enter</kbd> para elegir camino · <kbd>V</kbd> mapa · arrastrar piezas con el mouse</div>
+    <div><b>nivel 3 · corredor</b><kbd>A</kbd>/<kbd>D</kbd> cambiar de carril · <kbd>Espacio</kbd> saltar · <kbd>Ctrl</kbd> agacharse</div>
+    <div><b>nivel 4 · carrera</b><kbd>W</kbd> acelerar · <kbd>S</kbd> frenar · <kbd>A</kbd>/<kbd>D</kbd> girar · <kbd>Espacio</kbd> derrapar</div>
+    <div><b>en cualquier momento</b><kbd>Esc</kbd> pausa y ajustes · subtítulos y reducción de destellos en Ajustes</div>
+  </div>
+</div></section>
+
+<!-- ═════════ GALERÍA ═════════ -->
+<section id="galeria"><div class="wrap">
+  <div class="cab rev"><span class="mini">escenarios, arte y referencias</span><h2>galería</h2><p>Capturas del juego y las ilustraciones que inspiraron cada escenario. Haz clic para ampliar.</p></div>
+  <div class="galeria rev" id="gal">
+    <figure><img loading="lazy" src="img/shot-menu.jpg" alt="Menú principal del juego"><figcaption>menú principal</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-prologo.jpg" alt="Habitación de Arivelle"><figcaption>la habitación</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-habitacion.jpg" alt="Cama y ventana del cuarto"><figcaption>el cuarto de noche</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-eco.jpg" alt="Arivelle y El Eco en la salida del tablero"><figcaption>arivelle y el eco</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-mapa.jpg" alt="Rompecabezas de recuerdo"><figcaption>armar el recuerdo</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-hospital-2.jpg" alt="Arivelle en el hospital"><figcaption>hospital san eco</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-nivel3b.jpg" alt="Arivelle corriendo por Nueva York"><figcaption>a toda carrera</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-nivel4b.jpg" alt="Auto en la pista del corazón"><figcaption>la pista</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-epilogo.jpg" alt="Epílogo en la habitación"><figcaption>epílogo</figcaption></figure>
+    <figure><img loading="lazy" src="img/tablero-conceptos.jpg" alt="Tablero de conceptos de los niveles"><figcaption>conceptos de los niveles</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-nivel1.jpg" alt="Nivel 1"><figcaption>less · tablero</figcaption></figure>
+    <figure><img loading="lazy" src="img/concepto-tablero.png" alt="Concepto del tablero"><figcaption>concepto del tablero</figcaption></figure>
+    <figure><img loading="lazy" src="img/dados.png" alt="Dados con corazones"><figcaption>los dados</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-puzzle.jpg" alt="Rompecabezas"><figcaption>rompecabezas</figcaption></figure>
+    <figure><img loading="lazy" src="img/minijuego-boceto.png" alt="Boceto del minijuego"><figcaption>boceto del minijuego</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-nivel2.jpg" alt="Nivel 2"><figcaption>the cure · hospital</figcaption></figure>
+    <figure><img loading="lazy" src="img/parche-the-cure.jpg" alt="Parche The Cure"><figcaption>the cure</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-nivel3.jpg" alt="Nivel 3"><figcaption>stupid song</figcaption></figure>
+    <figure><img loading="lazy" src="img/nyc-calle.jpg" alt="Calle de Nueva York"><figcaption>nueva york</figcaption></figure>
+    <figure><img loading="lazy" src="img/nyc-rascacielos.png" alt="Rascacielos"><figcaption>rascacielos</figcaption></figure>
+    <figure><img loading="lazy" src="img/nyc-pintura.png" alt="Calle pintada"><figcaption>neón</figcaption></figure>
+    <figure><img loading="lazy" src="img/metro.png" alt="Estación de metro"><figcaption>el metro</figcaption></figure>
+    <figure><img loading="lazy" src="img/tren-rosa.jpg" alt="Tren rosa"><figcaption>tren rosa</figcaption></figure>
+    <figure><img loading="lazy" src="img/piano.png" alt="Piano rosa"><figcaption>piano rosa</figcaption></figure>
+    <figure><img loading="lazy" src="img/zapatillas-rama.jpg" alt="Zapatillas colgadas"><figcaption>zapatillas en la rama</figcaption></figure>
+    <figure><img loading="lazy" src="img/zapatillas-ballet.jpg" alt="Zapatillas de ballet"><figcaption>ballet</figcaption></figure>
+    <figure><img loading="lazy" src="img/globo-nieve.png" alt="Globo de nieve"><figcaption>globo de nieve</figcaption></figure>
+    <figure><img loading="lazy" src="img/globo-bailarina.jpg" alt="Globo con bailarina"><figcaption>la bailarina</figcaption></figure>
+    <figure><img loading="lazy" src="img/shot-nivel4.jpg" alt="Nivel 4"><figcaption>cigarette smoke</figcaption></figure>
+    <figure><img loading="lazy" src="img/concepto-carrera.png" alt="Concepto de la carrera"><figcaption>concepto de la pista</figcaption></figure>
+    <figure><img loading="lazy" src="img/titulo-cigarette-smoke.jpg" alt="Título Cigarette Smoke"><figcaption>cigarette smoke</figcaption></figure>
+    <figure><img loading="lazy" src="img/encendedor.jpg" alt="Encendedor"><figcaption>encendedor</figcaption></figure>
+    <figure><img loading="lazy" src="img/semaforo.png" alt="Semáforo con corazones"><figcaption>semáforo</figcaption></figure>
+    <figure><img loading="lazy" src="img/corazon-roto.png" alt="Corazón roto"><figcaption>corazón roto</figcaption></figure>
+    <figure><img loading="lazy" src="img/vinilo-corazon.png" alt="Vinilo con corazón"><figcaption>vinilo</figcaption></figure>
+    <figure><img loading="lazy" src="img/llave.png" alt="Llave"><figcaption>la llave</figcaption></figure>
+    <figure><img loading="lazy" src="img/estrella.jpg" alt="Estrella"><figcaption>estrella</figcaption></figure>
+    <figure><img loading="lazy" src="img/diario.jpg" alt="Diario rosa"><figcaption>el diario</figcaption></figure>
+    <figure><img loading="lazy" src="img/ari-ventana.jpg" alt="Arivelle junto a la ventana"><figcaption>en la ventana</figcaption></figure>
+    <figure><img loading="lazy" src="img/ari-lluvia.jpg" alt="Arivelle bajo la lluvia"><figcaption>lluvia</figcaption></figure>
+    <figure><img loading="lazy" src="img/ari-suelo.jpg" alt="Arivelle en el suelo"><figcaption>fotos en el suelo</figcaption></figure>
+    <figure><img loading="lazy" src="img/ari-almohada.jpg" alt="Arivelle abrazando una almohada"><figcaption>la almohada</figcaption></figure>
+    <figure><img loading="lazy" src="img/pasillo-amigas.jpg" alt="Arivelle y sus amigas en el pasillo"><figcaption>el pasillo</figcaption></figure>
+    <figure><img loading="lazy" src="img/expectativas.jpg" alt="Expectativas"><figcaption>expectativas</figcaption></figure>
+    <figure><img loading="lazy" src="img/burbuja.jpg" alt="Niña dentro de una burbuja"><figcaption>la burbuja</figcaption></figure>
+    <figure><img loading="lazy" src="img/campo.jpg" alt="Arivelle en un campo"><figcaption>el campo</figcaption></figure>
+  </div>
+</div></section>
+
+<!-- ═════════ AUTORES (parte final) ═════════ -->
+<div class="autores" id="autores"><div class="wrap">
+  <h2>autores</h2>
+  <p class="lema">hecho con cariño (y un poco de tristeza) por</p>
+  <div class="gente">
+    <a class="autor rev" href="https://github.com/DenisTae" target="_blank" rel="noopener noreferrer"><div class="av">D</div><b>Denis Medrano Carrasco</b><small>diseño y desarrollo del juego</small><span class="gh">github.com/DenisTae ↗</span></a>
+    <a class="autor rev" href="https://github.com/aritozs673-maker" target="_blank" rel="noopener noreferrer"><div class="av">A</div><b>Ariana Patzi Gonzales</b><small>diseño y desarrollo del juego</small><span class="gh">github.com/aritozs673-maker ↗</span></a>
+  </div>
+</div></div>
+</main>
+
+<footer class="pie">© 2026 YOU SEEM PRETTY SAD · proyecto académico de Game Development · hecho con Unity 6 · <a href="https://denistae.github.io/TheCureRun_Portal_GitHub/">volver al portal</a></footer>
+
+<div class="visor-img" id="vi" role="dialog" aria-label="Imagen ampliada"><img alt=""><p></p></div>
+
+<script>
+(function(){
+  /* aparición suave */
+  var rev=document.querySelectorAll('.rev');
+  if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.1});rev.forEach(function(r){io.observe(r)})}
+  else rev.forEach(function(r){r.classList.add('in')});
+
+  /* el juego se crea solo al pulsar START */
+  var visor=document.getElementById('visor'),portada=document.getElementById('portada'),pant=document.getElementById('pantalla');
+  document.getElementById('start').addEventListener('click',function(){
+    var f=document.createElement('iframe');f.src='juego/index.html';f.title='YOU SEEM PRETTY SAD';f.allow='fullscreen; autoplay; gamepad';f.setAttribute('allowfullscreen','');
+    visor.appendChild(f);portada.remove();pant.hidden=false;setTimeout(function(){try{f.focus()}catch(e){}},400);
+  });
+  pant.addEventListener('click',function(){var f=visor.querySelector('iframe');if(f&&f.requestFullscreen)f.requestFullscreen()});
+
+  /* galería ampliada */
+  var vi=document.getElementById('vi'),vimg=vi.querySelector('img'),vp=vi.querySelector('p');
+  document.getElementById('gal').addEventListener('click',function(e){var fig=e.target.closest('figure');if(!fig)return;var im=fig.querySelector('img');vimg.src=im.src;vimg.alt=im.alt;vp.textContent=fig.querySelector('figcaption').textContent;vi.classList.add('abierto')});
+  vi.addEventListener('click',function(){vi.classList.remove('abierto')});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')vi.classList.remove('abierto')});
+})();
+</script>
+</body>
+</html>
